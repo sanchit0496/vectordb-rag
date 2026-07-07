@@ -13,19 +13,19 @@ async function run() {
         const chunks = ingestDirectory('./knowledge');
         if (chunks.length > 0) {
             await addChunks(chunks);
-            console.log('✅ Ingestion complete!');
+            console.log('Ingestion complete!');
         } else {
-            console.log('⚠️ No text found in knowledge/ directory.');
+            console.log('No text found in knowledge/ directory.');
         }
     } 
     else if (command === 'ask') {
         const query = args.slice(1).join(' ');
         if (!query) {
-            console.log('❌ Please provide a question: node src/index.js ask "What is React?"');
+            console.log('Please provide a question: node src/index.js ask "What is React?"');
             return;
         }
 
-        console.log(`\n🗣️ Question: "${query}"`);
+        console.log(`\n Question: "${query}"`);
         
         // 1. Retrieve the clean data
         const relevantChunks = await search(query);
