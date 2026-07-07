@@ -1,42 +1,46 @@
 import { initCollection, addChunks, search } from './src/vectorStore.js';
 import { ingestDirectory } from './src/ingestor.js';
+import { generateAnswer } from './src/llm.js';
 
 async function run() {
-    console.log('🚀 Booting up Local RAG Engine...');
+    await initCollection();
     
-    try {
-        // 1. Ensure DB is ready
-        await initCollection();
+    const args = process.argv.slice(2);
+    const command = args[0];
 
-        const testQuery = "React JS Best Practices"; // Change this to match something in your test.md
-    console.log(`\nTesting search with query: "${testQuery}"`);
+    if (command === 'ingest') {
+        console.log('\n🚀 Starting ingestion pipeline...');
+        const chunks = ingestDirectory('./knowledge');
+        if (chunks.length > 0) {
+            await addChunks(chunks);
+            console.log('✅ Ingestion complete!');
+        } else {
+            console.log('⚠️ No text found in knowledge/ directory.');
+        }
+    } 
+    else if (command === 'ask') {
+        const query = args.slice(1).join(' ');
+        if (!query) {
+            console.log('❌ Please provide a question: node src/index.js ask "What is React?"');
+            return;
+        }
 
-    // 3. Run the search
-    const results = await search(testQuery);
-
-    // 4. Print the results clearly
-    console.log("\n--- TOP MATCHES FROM QDRANT ---");
-    results.forEach((res, index) => {
-        console.log(`\nMatch ${index + 1} | Score: ${res.score}`);
-        console.log(`Source: ${res.source}`);
-        console.log(`Content: ${res.content}`);
-    });
-
-        // // 2. Read and chunk local files
-        // const chunks = ingestDirectory('./knowledge');
+        console.log(`\n🗣️ Question: "${query}"`);
         
-        // if (chunks.length === 0) {
-        //     console.log('⚠️ No chunks found. Add some text files to the knowledge/ directory.');
-        //     return;
-        // }
-
-        // // 3. Generate embeddings and save to DB
-        // await addChunks(chunks);
+        // 1. Retrieve the clean data
+        const relevantChunks = await search(query);
         
-        console.log('✅ Ingestion pipeline complete! Check the Qdrant dashboard.');
-    } catch (error) {
-        console.error('❌ Pipeline failed:', error);
-        process.exit(1);
+        // 2. Generate the answer
+        const answer = await generateAnswer(query, relevantChunks);
+        
+        console.log('\n================ ANSWER ================');
+        console.log(answer);
+        console.log('========================================\n');
+    } 
+    else {
+        console.log('\nUsage:');
+        console.log('  node src/index.js ingest');
+        console.log('  node src/index.js ask "your question here"');
     }
 }
 
