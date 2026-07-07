@@ -63,37 +63,37 @@ const ToggleContext = createContext();
 
 // 2. Main Toggle Component (Container)
 const Toggle = ({ children, onToggle }) => {
-  const [on, setOn] = useState(false);
+    const [on, setOn] = useState(false);
 
-  const toggle = () => {
-    const newOn = !on;
-    setOn(newOn);
-    // Call the optional onToggle prop with the new state
-    onToggle && onToggle(newOn);
-  };
+    const toggle = () => {
+        const newOn = !on;
+        setOn(newOn);
+        // Call the optional onToggle prop with the new state
+        onToggle && onToggle(newOn);
+    };
 
-  // 3. Provide state and actions via Context to its children
-  return <ToggleContext.Provider value={{ on, toggle }}>{children}</ToggleContext.Provider>;
+    // 3. Provide state and actions via Context to its children
+    return <ToggleContext.Provider value={{ on, toggle }}>{children}</ToggleContext.Provider>;
 };
 
 // 4. Sub-components (Children) consume the Context
 const ToggleOn = ({ children }) => {
-  const { on } = useContext(ToggleContext);
-  return on ? children : null;
+    const { on } = useContext(ToggleContext);
+    return on ? children : null;
 };
 
 const ToggleOff = ({ children }) => {
-  const { on } = useContext(ToggleContext);
-  return on ? null : children;
+    const { on } = useContext(ToggleContext);
+    return on ? null : children;
 };
 
 const ToggleButton = ({ ...props }) => {
-  const { on, toggle } = useContext(ToggleContext);
-  return (
-    <button onClick={toggle} {...props}>
-      {on ? 'On' : 'Off'}
-    </button>
-  );
+    const { on, toggle } = useContext(ToggleContext);
+    return (
+        <button onClick={toggle} {...props}>
+            {on ? 'On' : 'Off'}
+        </button>
+    );
 };
 
 // 5. Attach sub-components as properties of the main component for easy access
@@ -153,12 +153,12 @@ import React, { createContext, useContext, useReducer } from 'react';
 const initialState = { theme: 'light' };
 
 function themeReducer(state, action) {
-  switch (action.type) {
-    case 'TOGGLE_THEME':
-      return { theme: state.theme === 'light' ? 'dark' : 'light' };
-    default:
-      throw new Error(`Unhandled action type: ${action.type}`);
-  }
+    switch (action.type) {
+        case 'TOGGLE_THEME':
+            return { theme: state.theme === 'light' ? 'dark' : 'light' };
+        default:
+            throw new Error(`Unhandled action type: ${action.type}`);
+    }
 }
 
 // 2. Create Context
@@ -166,8 +166,8 @@ const ThemeContext = createContext();
 
 // 3. Create a Provider component to wrap parts of your app that need access to the state
 export const ThemeProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(themeReducer, initialState);
-  return <ThemeContext.Provider value={{ state, dispatch }}>{children}</ThemeContext.Provider>;
+    const [state, dispatch] = useReducer(themeReducer, initialState);
+    return <ThemeContext.Provider value={{ state, dispatch }}>{children}</ThemeContext.Provider>;
 };
 
 // 4. Create a custom hook for easy consumption of the context
@@ -238,47 +238,49 @@ import React, { useState, useCallback, useMemo } from 'react';
 // A simple presentational component, wrapped with React.memo
 // This component will only re-render if its 'data' or 'onClick' props change
 const MemoizedChild = React.memo(({ data, onClick }) => {
-  console.log('MemoizedChild rendered'); // This will only log if data or onClick changes
-  return (
-    <div>
-      <p>Data: {data}</p>
-      <button onClick={onClick}>Click Child</button>
-    </div>
-  );
+    console.log('MemoizedChild rendered'); // This will only log if data or onClick changes
+    return (
+        <div>
+            <p>Data: {data}</p>
+            <button onClick={onClick}>Click Child</button>
+        </div>
+    );
 });
 
 function ParentComponent() {
-  const [count, setCount] = useState(0);
-  const [text, setText] = useState('Hello');
+    const [count, setCount] = useState(0);
+    const [text, setText] = useState('Hello');
 
-  // `handleClick` is memoized. It will only be re-created if its dependencies change.
-  // With an empty dependency array `[]`, it's created once.
-  const handleClick = useCallback(() => {
-    setCount((prevCount) => prevCount + 1);
-  }, []);
+    // `handleClick` is memoized. It will only be re-created if its dependencies change.
+    // With an empty dependency array `[]`, it's created once.
+    const handleClick = useCallback(() => {
+        setCount((prevCount) => prevCount + 1);
+    }, []);
 
-  // `expensiveValue` is memoized. It will only be re-computed if `count` changes.
-  const expensiveValue = useMemo(() => {
-    console.log('Computing expensive value...');
-    let result = 0;
-    for (let i = 0; i < count * 100000; i++) {
-      // Simulate an expensive calculation
-      result += i;
-    }
-    return result;
-  }, [count]); // Re-compute only when count changes
+    // `expensiveValue` is memoized. It will only be re-computed if `count` changes.
+    const expensiveValue = useMemo(() => {
+        console.log('Computing expensive value...');
+        let result = 0;
+        for (let i = 0; i < count * 100000; i++) {
+            // Simulate an expensive calculation
+            result += i;
+        }
+        return result;
+    }, [count]); // Re-compute only when count changes
 
-  return (
-    <div>
-      <h1>Parent Component</h1>
-      <p>Count: {count}</p>
-      <p>Text: {text}</p>
-      <p>Expensive Value: {expensiveValue}</p>
-      <button onClick={() => setText(text === 'Hello' ? 'World' : 'Hello')}>Change Text (Parent Re-renders)</button>
-      {/* MemoizedChild receives `text` (which changes) and `handleClick` (which is memoized) */}
-      <MemoizedChild data={text} onClick={handleClick} />
-    </div>
-  );
+    return (
+        <div>
+            <h1>Parent Component</h1>
+            <p>Count: {count}</p>
+            <p>Text: {text}</p>
+            <p>Expensive Value: {expensiveValue}</p>
+            <button onClick={() => setText(text === 'Hello' ? 'World' : 'Hello')}>
+                Change Text (Parent Re-renders)
+            </button>
+            {/* MemoizedChild receives `text` (which changes) and `handleClick` (which is memoized) */}
+            <MemoizedChild data={text} onClick={handleClick} />
+        </div>
+    );
 }
 
 export default ParentComponent;
@@ -301,21 +303,21 @@ import React, { Suspense, lazy } from 'react';
 const LazyComponent = lazy(() => import('./LazyComponent'));
 
 function App() {
-  const [showLazy, setShowLazy] = React.useState(false);
+    const [showLazy, setShowLazy] = React.useState(false);
 
-  return (
-    <div>
-      <h1>My App</h1>
-      <button onClick={() => setShowLazy(true)}>Load Lazy Component</button>
+    return (
+        <div>
+            <h1>My App</h1>
+            <button onClick={() => setShowLazy(true)}>Load Lazy Component</button>
 
-      {showLazy && (
-        // Suspense displays a fallback UI while the lazy component is loading
-        <Suspense fallback={<div>Loading Lazy Component...</div>}>
-          <LazyComponent />
-        </Suspense>
-      )}
-    </div>
-  );
+            {showLazy && (
+                // Suspense displays a fallback UI while the lazy component is loading
+                <Suspense fallback={<div>Loading Lazy Component...</div>}>
+                    <LazyComponent />
+                </Suspense>
+            )}
+        </div>
+    );
 }
 ```
 
@@ -343,39 +345,39 @@ The "Testing Trophy" (a modern take on the "Testing Pyramid") emphasizes a balan
 ### Recommended Tools and Methodologies
 
 - **Unit & Integration Testing (React Testing Library & Jest):**
-  - **Jest:** A powerful JavaScript testing framework used for unit and integration tests. It provides an assertion library, test runner, and mocking capabilities.
-  - **React Testing Library (RTL):** Focuses on testing components the way users interact with them, rather than implementation details. This encourages more robust and maintainable tests that are less prone to breaking from internal refactoring. RTL queries elements by their accessible roles, text content, or labels, promoting good accessibility practices.
+    - **Jest:** A powerful JavaScript testing framework used for unit and integration tests. It provides an assertion library, test runner, and mocking capabilities.
+    - **React Testing Library (RTL):** Focuses on testing components the way users interact with them, rather than implementation details. This encourages more robust and maintainable tests that are less prone to breaking from internal refactoring. RTL queries elements by their accessible roles, text content, or labels, promoting good accessibility practices.
 
-  ```jsx
-  // Example: A simple test for a Button component using React Testing Library
-  import React from 'react';
-  import { render, screen, fireEvent } from '@testing-library/react';
-  import '@testing-library/jest-dom'; // For extended matchers like .toBeInTheDocument()
+    ```jsx
+    // Example: A simple test for a Button component using React Testing Library
+    import React from 'react';
+    import { render, screen, fireEvent } from '@testing-library/react';
+    import '@testing-library/jest-dom'; // For extended matchers like .toBeInTheDocument()
 
-  // A simple Button component to test
-  const Button = ({ onClick, children }) => <button onClick={onClick}>{children}</button>;
+    // A simple Button component to test
+    const Button = ({ onClick, children }) => <button onClick={onClick}>{children}</button>;
 
-  test('renders button with correct text and handles click', () => {
-    // Create a mock function to track if onClick is called
-    const handleClick = jest.fn();
+    test('renders button with correct text and handles click', () => {
+        // Create a mock function to track if onClick is called
+        const handleClick = jest.fn();
 
-    // Render the component into a virtual DOM
-    render(<Button onClick={handleClick}>Click Me</Button>);
+        // Render the component into a virtual DOM
+        render(<Button onClick={handleClick}>Click Me</Button>);
 
-    // Use screen.getByText to find the button by its visible text content
-    const buttonElement = screen.getByText(/click me/i);
-    expect(buttonElement).toBeInTheDocument(); // Assert that the button is in the document
+        // Use screen.getByText to find the button by its visible text content
+        const buttonElement = screen.getByText(/click me/i);
+        expect(buttonElement).toBeInTheDocument(); // Assert that the button is in the document
 
-    // Simulate a click event on the button
-    fireEvent.click(buttonElement);
+        // Simulate a click event on the button
+        fireEvent.click(buttonElement);
 
-    // Assert that the mock function was called exactly once
-    expect(handleClick).toHaveBeenCalledTimes(1);
-  });
-  ```
+        // Assert that the mock function was called exactly once
+        expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+    ```
 
 - **End-to-End (E2E) Testing (Cypress):**
-  - **Cypress:** A fast, easy, and reliable E2E testing framework that runs tests directly in the browser. It provides an excellent developer experience with real-time reloads, time travel debugging, and automatic waiting. Focus your E2E tests on critical user flows (e.g., user login, checkout process, form submission) rather than exhaustive UI checks, which are better suited for integration tests.
+    - **Cypress:** A fast, easy, and reliable E2E testing framework that runs tests directly in the browser. It provides an excellent developer experience with real-time reloads, time travel debugging, and automatic waiting. Focus your E2E tests on critical user flows (e.g., user login, checkout process, form submission) rather than exhaustive UI checks, which are better suited for integration tests.
 
 **Testing Methodologies:**
 
@@ -437,40 +439,40 @@ To maximize the benefits of these tools, automate their usage:
 ```json
 // Example `package.json` snippet showing typical dev dependencies and scripts
 {
-  "name": "my-react-app",
-  "version": "0.1.0",
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "lint": "eslint \"./src/**/*.{js,jsx,ts,tsx}\"",
-    "lint:fix": "eslint \"./src/**/*.{js,jsx,ts,tsx}\" --fix",
-    "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest",
-      "plugin:jsx-a11y/recommended" // Example: adding accessibility linting rules
-    ]
-  },
-  "devDependencies": {
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.96",
-    "@types/react": "^18.2.79",
-    "@types/react-dom": "^18.2.25",
-    "@typescript-eslint/eslint-plugin": "^7.7.0",
-    "@typescript-eslint/parser": "^7.7.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-jsx-a11y": "^6.8.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "eslint-plugin-react": "^7.34.1",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^3.2.5",
-    "typescript": "^4.9.5"
-  }
+    "name": "my-react-app",
+    "version": "0.1.0",
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject",
+        "lint": "eslint \"./src/**/*.{js,jsx,ts,tsx}\"",
+        "lint:fix": "eslint \"./src/**/*.{js,jsx,ts,tsx}\" --fix",
+        "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
+    },
+    "eslintConfig": {
+        "extends": [
+            "react-app",
+            "react-app/jest",
+            "plugin:jsx-a11y/recommended" // Example: adding accessibility linting rules
+        ]
+    },
+    "devDependencies": {
+        "@types/jest": "^27.5.2",
+        "@types/node": "^16.18.96",
+        "@types/react": "^18.2.79",
+        "@types/react-dom": "^18.2.25",
+        "@typescript-eslint/eslint-plugin": "^7.7.0",
+        "@typescript-eslint/parser": "^7.7.0",
+        "eslint": "^8.57.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-jsx-a11y": "^6.8.0",
+        "eslint-plugin-prettier": "^5.1.3",
+        "eslint-plugin-react": "^7.34.1",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "prettier": "^3.2.5",
+        "typescript": "^4.9.5"
+    }
 }
 ```
 

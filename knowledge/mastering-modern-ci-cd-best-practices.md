@@ -54,89 +54,89 @@ With PaC, the entire workflow—from fetching code to building, testing, and dep
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - name: Install dependencies
-        run: npm ci
-      - name: Run tests
-        run: npm test
-      - name: Build application
-        run: npm run build --if-present
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: my-app-build
-          path: dist # Assuming 'npm run build' outputs to 'dist'
+    build-and-test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '18'
+            - name: Install dependencies
+              run: npm ci
+            - name: Run tests
+              run: npm test
+            - name: Build application
+              run: npm run build --if-present
+            - name: Upload build artifact
+              uses: actions/upload-artifact@v3
+              with:
+                  name: my-app-build
+                  path: dist # Assuming 'npm run build' outputs to 'dist'
 
-  deploy-to-staging:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    environment: staging
-    steps:
-      - uses: actions/checkout@v3 # Needed if deployment scripts are in the repo
-      - name: Download build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: my-app-build
-          path: ./dist
-      - name: Deploy to staging server
-        run: |
-          echo "Deploying to staging with API_KEY: ${{ secrets.STAGING_API_KEY }}"
-          # Add actual deployment commands here, e.g., rsync, kubectl apply, etc.
-          # Example: kubectl apply -f ./dist/kubernetes/staging-deployment.yaml
+    deploy-to-staging:
+        needs: build-and-test
+        runs-on: ubuntu-latest
+        environment: staging
+        steps:
+            - uses: actions/checkout@v3 # Needed if deployment scripts are in the repo
+            - name: Download build artifact
+              uses: actions/download-artifact@v3
+              with:
+                  name: my-app-build
+                  path: ./dist
+            - name: Deploy to staging server
+              run: |
+                  echo "Deploying to staging with API_KEY: ${{ secrets.STAGING_API_KEY }}"
+                  # Add actual deployment commands here, e.g., rsync, kubectl apply, etc.
+                  # Example: kubectl apply -f ./dist/kubernetes/staging-deployment.yaml
 ```
 
 **GitLab CI (`.gitlab-ci.yml`):**
 
 ```yaml
 stages:
-  - build
-  - test
-  - deploy
+    - build
+    - test
+    - deploy
 
 build_job:
-  stage: build
-  script:
-    - echo "Building the application..."
-    - npm ci
-    - npm run build
-  artifacts:
-    paths:
-      - dist/
-    expire_in: 1 day
+    stage: build
+    script:
+        - echo "Building the application..."
+        - npm ci
+        - npm run build
+    artifacts:
+        paths:
+            - dist/
+        expire_in: 1 day
 
 test_job:
-  stage: test
-  script:
-    - echo "Running tests..."
-    - npm test
-  needs: ['build_job']
+    stage: test
+    script:
+        - echo "Running tests..."
+        - npm test
+    needs: ['build_job']
 
 deploy_staging_job:
-  stage: deploy
-  script:
-    - echo "Deploying to staging environment..."
-    - kubectl apply -f kubernetes/staging.yaml
-  environment:
-    name: staging
-    url: https://staging.example.com
-  only:
-    - main
-  needs: ['test_job']
+    stage: deploy
+    script:
+        - echo "Deploying to staging environment..."
+        - kubectl apply -f kubernetes/staging.yaml
+    environment:
+        name: staging
+        url: https://staging.example.com
+    only:
+        - main
+    needs: ['test_job']
 ```
 
 These examples demonstrate how pipeline steps, stages, and dependencies are defined directly within the repository, making them versioned and part of the project's codebase.
@@ -209,45 +209,45 @@ Modern DevSecOps extends to securing the entire software supply chain. This invo
 
 ```yaml
 stages:
-  - build
-  - security_scan
-  - test
-  - deploy
+    - build
+    - security_scan
+    - test
+    - deploy
 
 build_job:
-  stage: build
-  script:
-    - docker build -t my-app:$CI_COMMIT_SHORT_SHA .
-  artifacts:
-    paths:
-      - . # To pass source code context to subsequent stages if needed
-  only:
-    - main
+    stage: build
+    script:
+        - docker build -t my-app:$CI_COMMIT_SHORT_SHA .
+    artifacts:
+        paths:
+            - . # To pass source code context to subsequent stages if needed
+    only:
+        - main
 
 sast_scan:
-  stage: security_scan
-  image: sonarsource/sonar-scanner-cli:latest
-  script:
-    - echo "Running SAST scan with SonarQube..."
-    - sonar-scanner -Dsonar.projectKey=my-app -Dsonar.sources=. -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN
-  allow_failure: true # Optionally allow failure for feedback, but fail pipeline on critical issues
-  needs: ['build_job']
+    stage: security_scan
+    image: sonarsource/sonar-scanner-cli:latest
+    script:
+        - echo "Running SAST scan with SonarQube..."
+        - sonar-scanner -Dsonar.projectKey=my-app -Dsonar.sources=. -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN
+    allow_failure: true # Optionally allow failure for feedback, but fail pipeline on critical issues
+    needs: ['build_job']
 
 sca_scan:
-  stage: security_scan
-  image: snyk/snyk-cli:latest
-  script:
-    - echo "Running SCA scan with Snyk..."
-    - snyk test --file=package.json --fail-on=all
-  needs: ['build_job']
+    stage: security_scan
+    image: snyk/snyk-cli:latest
+    script:
+        - echo "Running SCA scan with Snyk..."
+        - snyk test --file=package.json --fail-on=all
+    needs: ['build_job']
 
 container_scan:
-  stage: security_scan
-  image: aquasec/trivy:latest
-  script:
-    - echo "Running container image scan with Trivy..."
-    - trivy image --exit-code 1 --severity CRITICAL,HIGH my-app:$CI_COMMIT_SHORT_SHA
-  needs: ['build_job']
+    stage: security_scan
+    image: aquasec/trivy:latest
+    script:
+        - echo "Running container image scan with Trivy..."
+        - trivy image --exit-code 1 --severity CRITICAL,HIGH my-app:$CI_COMMIT_SHORT_SHA
+    needs: ['build_job']
 
 # ... other test and deploy stages ...
 ```
@@ -325,29 +325,29 @@ A robust CI/CD pipeline is only as good as the confidence it provides in the dep
 The testing pyramid suggests that you should have a large number of fast, granular tests at the base and progressively fewer, slower, more comprehensive tests at the top.
 
 - **Base: Unit Tests (High Volume, Fast)**
-  - **Objective:** Verify individual components or functions in isolation.
-  - **Characteristics:** Extremely fast, cover small code units, mock external dependencies.
-  - **Placement in CI/CD:** Run first and most frequently, often on every commit. They provide immediate feedback to developers.
-  - **Example:** Testing a single function's logic.
+    - **Objective:** Verify individual components or functions in isolation.
+    - **Characteristics:** Extremely fast, cover small code units, mock external dependencies.
+    - **Placement in CI/CD:** Run first and most frequently, often on every commit. They provide immediate feedback to developers.
+    - **Example:** Testing a single function's logic.
 
 - **Middle: Integration Tests (Medium Volume, Moderate Speed)**
-  - **Objective:** Verify interactions between different components or services.
-  - **Characteristics:** Test how modules, services, or databases interact. May involve actual database connections or API calls to other services.
-  - **Placement in CI/CD:** Run after unit tests pass, typically on feature branches or before merging to `main`.
-  - **Example:** Testing if a service correctly writes data to a database or communicates with another microservice.
+    - **Objective:** Verify interactions between different components or services.
+    - **Characteristics:** Test how modules, services, or databases interact. May involve actual database connections or API calls to other services.
+    - **Placement in CI/CD:** Run after unit tests pass, typically on feature branches or before merging to `main`.
+    - **Example:** Testing if a service correctly writes data to a database or communicates with another microservice.
 
 - **Higher: End-to-End (E2E) Tests (Low Volume, Slow)**
-  - **Objective:** Simulate real user flows through the entire application, including the UI, backend, and external systems.
-  - **Characteristics:** Slower, more complex, require a fully deployed environment.
-  - **Placement in CI/CD:** Run in a staging or pre-production environment after integration tests pass and the application is deployed.
-  - **Tools:** Cypress, Selenium, Playwright.
-  - **Example:** Simulating a user logging in, adding an item to a cart, and checking out.
+    - **Objective:** Simulate real user flows through the entire application, including the UI, backend, and external systems.
+    - **Characteristics:** Slower, more complex, require a fully deployed environment.
+    - **Placement in CI/CD:** Run in a staging or pre-production environment after integration tests pass and the application is deployed.
+    - **Tools:** Cypress, Selenium, Playwright.
+    - **Example:** Simulating a user logging in, adding an item to a cart, and checking out.
 
 - **Apex: Performance, Load, and Security Tests (Lowest Volume, Slowest)**
-  - **Objective:** Assess non-functional requirements like scalability, responsiveness, and resilience, and identify vulnerabilities.
-  - **Characteristics:** Resource-intensive, often run less frequently (e.g., nightly, weekly, or before major releases).
-  - **Placement in CI/CD:** In dedicated performance/security testing environments, typically after successful E2E tests.
-  - **Tools:** JMeter, k6 for performance; OWASP ZAP, Burp Suite for DAST (recap from DevSecOps).
+    - **Objective:** Assess non-functional requirements like scalability, responsiveness, and resilience, and identify vulnerabilities.
+    - **Characteristics:** Resource-intensive, often run less frequently (e.g., nightly, weekly, or before major releases).
+    - **Placement in CI/CD:** In dedicated performance/security testing environments, typically after successful E2E tests.
+    - **Tools:** JMeter, k6 for performance; OWASP ZAP, Burp Suite for DAST (recap from DevSecOps).
 
 ### Managing Realistic and Consistent Test Data
 
@@ -370,52 +370,52 @@ For tests to be truly reliable, the testing environments must closely mirror pro
 
 ```yaml
 stages:
-  - build
-  - unit_test
-  - integration_test
-  - e2e_test
-  - deploy
+    - build
+    - unit_test
+    - integration_test
+    - e2e_test
+    - deploy
 
 build_app:
-  stage: build
-  script:
-    - echo "Building application..."
-    - docker build -t my-app:$CI_COMMIT_SHORT_SHA .
+    stage: build
+    script:
+        - echo "Building application..."
+        - docker build -t my-app:$CI_COMMIT_SHORT_SHA .
 
 run_unit_tests:
-  stage: unit_test
-  script:
-    - echo "Running unit tests..."
-    - docker run my-app:$CI_COMMIT_SHORT_SHA npm test -- --coverage # Example for Node.js
-  needs: ['build_app']
+    stage: unit_test
+    script:
+        - echo "Running unit tests..."
+        - docker run my-app:$CI_COMMIT_SHORT_SHA npm test -- --coverage # Example for Node.js
+    needs: ['build_app']
 
 run_integration_tests:
-  stage: integration_test
-  # Assumes a database or other services are spun up for this stage
-  script:
-    - echo "Running integration tests..."
-    - docker-compose -f docker-compose.test.yml up -d
-    - docker exec my-app-integration-test npm run integration-test
-    - docker-compose -f docker-compose.test.yml down
-  needs: ['run_unit_tests']
+    stage: integration_test
+    # Assumes a database or other services are spun up for this stage
+    script:
+        - echo "Running integration tests..."
+        - docker-compose -f docker-compose.test.yml up -d
+        - docker exec my-app-integration-test npm run integration-test
+        - docker-compose -f docker-compose.test.yml down
+    needs: ['run_unit_tests']
 
 run_e2e_tests:
-  stage: e2e_test
-  # Requires a deployed application in a staging environment
-  script:
-    - echo "Deploying to temporary E2E environment..."
-    - kubectl apply -f kubernetes/e2e-env.yaml
-    - echo "Running E2E tests with Cypress..."
-    - cypress run --config baseUrl=http://e2e-app.example.com
-    - kubectl delete -f kubernetes/e2e-env.yaml # Clean up
-  needs: ['run_integration_tests']
+    stage: e2e_test
+    # Requires a deployed application in a staging environment
+    script:
+        - echo "Deploying to temporary E2E environment..."
+        - kubectl apply -f kubernetes/e2e-env.yaml
+        - echo "Running E2E tests with Cypress..."
+        - cypress run --config baseUrl=http://e2e-app.example.com
+        - kubectl delete -f kubernetes/e2e-env.yaml # Clean up
+    needs: ['run_integration_tests']
 
 deploy_to_staging:
-  stage: deploy
-  script:
-    - echo "Deploying to staging..."
-    - kubectl apply -f kubernetes/staging.yaml
-  needs: ['run_e2e_tests']
+    stage: deploy
+    script:
+        - echo "Deploying to staging..."
+        - kubectl apply -f kubernetes/staging.yaml
+    needs: ['run_e2e_tests']
 ```
 
 **Architectural Tradeoffs:**
@@ -545,45 +545,45 @@ Modern pipelines must be resilient. This involves:
 ```yaml
 # .gitlab-ci.yml (or GitHub Actions workflow)
 stages:
-  - build
-  - test
-  - publish_image
-  - update_gitops_repo
+    - build
+    - test
+    - publish_image
+    - update_gitops_repo
 
 build_and_test:
-  stage: build
-  script:
-    - docker build -t my-app:$CI_COMMIT_SHORT_SHA .
-    - npm test
+    stage: build
+    script:
+        - docker build -t my-app:$CI_COMMIT_SHORT_SHA .
+        - npm test
 
 publish_image:
-  stage: publish_image
-  script:
-    - docker push my-registry/my-app:$CI_COMMIT_SHORT_SHA
-  needs: ['build_and_test']
+    stage: publish_image
+    script:
+        - docker push my-registry/my-app:$CI_COMMIT_SHORT_SHA
+    needs: ['build_and_test']
 
 update_gitops_repo:
-  stage: update_gitops_repo
-  script:
-    - |
-      # Clone the GitOps repository
-      git clone https://github.com/my-org/gitops-config.git
-      cd gitops-config
-      git config user.email "ci@example.com"
-      git config user.name "CI Bot"
+    stage: update_gitops_repo
+    script:
+        - |
+            # Clone the GitOps repository
+            git clone https://github.com/my-org/gitops-config.git
+            cd gitops-config
+            git config user.email "ci@example.com"
+            git config user.name "CI Bot"
 
-      # Update the image tag in the Kubernetes manifest
-      # Using yq or similar tool is more robust than sed for YAML
-      # Example with sed (less robust for complex YAML):
-      sed -i "s|image: my-registry/my-app:.*|image: my-registry/my-app:$CI_COMMIT_SHORT_SHA|g" apps/my-app/deployment.yaml
+            # Update the image tag in the Kubernetes manifest
+            # Using yq or similar tool is more robust than sed for YAML
+            # Example with sed (less robust for complex YAML):
+            sed -i "s|image: my-registry/my-app:.*|image: my-registry/my-app:$CI_COMMIT_SHORT_SHA|g" apps/my-app/deployment.yaml
 
-      # Commit and push the change
-      git add apps/my-app/deployment.yaml
-      git commit -m "Update my-app to $CI_COMMIT_SHORT_SHA [skip ci]"
-      git push origin main
-  needs: ['publish_image']
-  # The GitOps operator (e.g., Argo CD) watching 'gitops-config' will detect this commit
-  # and automatically deploy the new image to Kubernetes.
+            # Commit and push the change
+            git add apps/my-app/deployment.yaml
+            git commit -m "Update my-app to $CI_COMMIT_SHORT_SHA [skip ci]"
+            git push origin main
+    needs: ['publish_image']
+    # The GitOps operator (e.g., Argo CD) watching 'gitops-config' will detect this commit
+    # and automatically deploy the new image to Kubernetes.
 ```
 
 **Architectural Tradeoffs:**

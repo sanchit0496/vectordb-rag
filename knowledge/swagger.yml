@@ -1,0 +1,319 @@
+openapi: 3.0.3
+
+info:
+    title: Developer Knowledge Portal API
+    version: 1.0.0
+    description: |
+        REST API for the Developer Knowledge Portal.
+
+        This API serves framework metadata, engineering best practices,
+        learning resources and related documentation.
+
+        All frontend applications including React, Angular and React Native
+        consume these endpoints.
+
+servers:
+    - url: http://localhost:3000
+      description: Local Development
+
+tags:
+    - name: Frameworks
+      description: Framework metadata endpoints
+
+    - name: Health
+      description: Health monitoring
+
+paths:
+    /health:
+        get:
+            tags:
+                - Health
+            summary: Health Check
+            responses:
+                '200':
+                    description: Service is healthy
+
+    /api/v1/frameworks:
+        get:
+            tags:
+                - Frameworks
+
+            summary: List Frameworks
+
+            description: |
+                Returns all supported frameworks.
+
+                The endpoint is consumed by the
+                Developer Knowledge Portal frontend.
+
+            parameters:
+                - $ref: '#/components/parameters/ClientVersion'
+
+            responses:
+                '200':
+                    description: Framework list
+
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+
+                                items:
+                                    $ref: '#/components/schemas/Framework'
+
+                            examples:
+                                frameworks:
+                                    value:
+                                        - id: 1
+                                          name: react
+                                          language: JavaScript
+
+                                        - id: 2
+                                          name: angular
+                                          language: TypeScript
+
+                                        - id: 3
+                                          name: vue
+                                          language: JavaScript
+
+                                        - id: 4
+                                          name: python
+                                          language: Python
+
+                                        - id: 5
+                                          name: java
+                                          language: Java
+
+                                        - id: 6
+                                          name: c
+                                          language: C
+
+                                        - id: 7
+                                          name: cpp
+                                          language: C++
+
+    /api/v1/frameworks/{name}:
+        get:
+            tags:
+                - Frameworks
+
+            summary: Get Framework Details
+
+            description: |
+
+                Returns metadata for a framework.
+
+                Supported values include:
+
+                - react
+                - angular
+                - vue
+                - python
+                - java
+                - c
+                - cpp
+
+            parameters:
+                - $ref: '#/components/parameters/FrameworkName'
+
+                - $ref: '#/components/parameters/ClientVersion'
+
+            responses:
+                '200':
+                    description: Framework details
+
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FrameworkDetails'
+
+                            examples:
+                                react:
+                                    value:
+                                        id: 1
+
+                                        name: react
+
+                                        language: JavaScript
+
+                                        latestVersion: '19.0'
+
+                                        difficulty: Intermediate
+
+                                        recommendedIDE: VS Code
+
+                                        officialWebsite: https://react.dev
+
+                                        description: >
+                                            React is a component-based frontend library
+                                            used to build modern web applications.
+
+                                        topics:
+                                            - Components
+                                            - JSX
+                                            - Hooks
+                                            - State Management
+                                            - Routing
+                                            - Performance
+
+                                        prerequisites:
+                                            - JavaScript
+                                            - ES6
+                                            - HTML
+                                            - CSS
+
+                                        learningResources:
+                                            - React Documentation
+                                            - React Tutorial
+                                            - Component Lifecycle Guide
+
+                '400':
+                    description: Missing required header
+
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+                '404':
+                    description: Framework not found
+
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+                '500':
+                    description: Internal server error
+
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+components:
+    parameters:
+        ClientVersion:
+            name: X-Client-Version
+
+            in: header
+
+            required: true
+
+            description: |
+                Required on every GET request.
+
+                This header is enforced by the backend
+                security policy.
+
+            schema:
+                type: string
+
+                example: '1.2.0'
+
+        FrameworkName:
+            name: name
+
+            in: path
+
+            required: true
+
+            description: Framework identifier
+
+            schema:
+                type: string
+
+                enum:
+                    - react
+                    - angular
+                    - vue
+                    - python
+                    - java
+                    - c
+                    - cpp
+
+    schemas:
+        Framework:
+            type: object
+
+            properties:
+                id:
+                    type: integer
+
+                    example: 1
+
+                name:
+                    type: string
+
+                    example: react
+
+                language:
+                    type: string
+
+                    example: JavaScript
+
+        FrameworkDetails:
+            type: object
+
+            properties:
+                id:
+                    type: integer
+
+                name:
+                    type: string
+
+                language:
+                    type: string
+
+                latestVersion:
+                    type: string
+
+                difficulty:
+                    type: string
+
+                recommendedIDE:
+                    type: string
+
+                officialWebsite:
+                    type: string
+
+                description:
+                    type: string
+
+                topics:
+                    type: array
+
+                    items:
+                        type: string
+
+                prerequisites:
+                    type: array
+
+                    items:
+                        type: string
+
+                learningResources:
+                    type: array
+
+                    items:
+                        type: string
+
+        Error:
+            type: object
+
+            properties:
+                status:
+                    type: integer
+                    example: 400
+
+                error:
+                    type: string
+                    example: Bad Request
+
+                message:
+                    type: string
+                    example: X-Client-Version header is required.
+
+                correlationId:
+                    type: string
+                    example: req-8d93f8ab-c2b8-45f0-b01f-0f8e21a9b12d

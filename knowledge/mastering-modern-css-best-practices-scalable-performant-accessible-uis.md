@@ -36,47 +36,47 @@ BEM is a strict naming convention that helps achieve modularity and reusability 
 ```html
 <!-- BEM HTML Structure -->
 <div class="card card--featured">
-  <img class="card__image" src="image.jpg" alt="Card image" />
-  <h2 class="card__title card__title--large">Product Title</h2>
-  <p class="card__description">Description of the product.</p>
-  <button class="card__button">Learn More</button>
+    <img class="card__image" src="image.jpg" alt="Card image" />
+    <h2 class="card__title card__title--large">Product Title</h2>
+    <p class="card__description">Description of the product.</p>
+    <button class="card__button">Learn More</button>
 </div>
 ```
 
 ```css
 /* BEM CSS */
 .card {
-  border: 1px solid #eee;
-  padding: 1rem;
-  margin: 1rem;
+    border: 1px solid #eee;
+    padding: 1rem;
+    margin: 1rem;
 }
 
 .card--featured {
-  border-color: #007bff;
-  box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
 }
 
 .card__image {
-  max-width: 100%;
-  height: auto;
+    max-width: 100%;
+    height: auto;
 }
 
 .card__title {
-  font-size: 1.25rem;
-  color: #333;
+    font-size: 1.25rem;
+    color: #333;
 }
 
 .card__title--large {
-  font-size: 1.5rem;
-  color: #007bff;
+    font-size: 1.5rem;
+    color: #007bff;
 }
 
 .card__button {
-  background-color: #007bff;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    cursor: pointer;
 }
 ```
 
@@ -141,10 +141,12 @@ Utility-first CSS frameworks, like Tailwind CSS, represent a distinct paradigm. 
 ```html
 <!-- Utility-First HTML Structure (Tailwind CSS) -->
 <div class="border border-gray-200 p-4 m-4 shadow-md rounded-lg">
-  <img class="w-full h-48 object-cover mb-4" src="image.jpg" alt="Card image" />
-  <h2 class="text-xl font-semibold text-gray-800 mb-2">Product Title</h2>
-  <p class="text-gray-600 text-sm mb-4">Description of the product.</p>
-  <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Learn More</button>
+    <img class="w-full h-48 object-cover mb-4" src="image.jpg" alt="Card image" />
+    <h2 class="text-xl font-semibold text-gray-800 mb-2">Product Title</h2>
+    <p class="text-gray-600 text-sm mb-4">Description of the product.</p>
+    <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+        Learn More
+    </button>
 </div>
 ```
 
@@ -190,24 +192,24 @@ CSS Custom Properties, often called CSS variables, are a game-changer for managi
 ```css
 /* Define custom properties on the root element */
 :root {
-  --primary-color: #007bff;
-  --secondary-color: #6c757d;
-  --spacing-unit: 1rem;
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --spacing-unit: 1rem;
 }
 
 /* Use custom properties */
 .button {
-  background-color: var(--primary-color);
-  color: white;
-  padding: calc(var(--spacing-unit) / 2) var(--spacing-unit);
-  border: none;
-  border-radius: 0.25rem;
-  font-size: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    padding: calc(var(--spacing-unit) / 2) var(--spacing-unit);
+    border: none;
+    border-radius: 0.25rem;
+    font-size: 1rem;
 }
 
 .card {
-  border: 1px solid var(--secondary-color);
-  margin: var(--spacing-unit);
+    border: 1px solid var(--secondary-color);
+    margin: var(--spacing-unit);
 }
 ```
 
@@ -245,16 +247,16 @@ Logical properties define physical directions (e.g., `margin-left`) in terms of 
 ```css
 /* Traditional physical properties */
 .box-physical {
-  margin-left: 1rem;
-  padding-top: 0.5rem;
-  border-right: 2px solid blue;
+    margin-left: 1rem;
+    padding-top: 0.5rem;
+    border-right: 2px solid blue;
 }
 
 /* Equivalent logical properties */
 .box-logical {
-  margin-inline-start: 1rem; /* Adapts to start of line (left in LTR, right in RTL) */
-  padding-block-start: 0.5rem; /* Adapts to start of block (top in horizontal writing modes) */
-  border-inline-end: 2px solid blue; /* Adapts to end of line */
+    margin-inline-start: 1rem; /* Adapts to start of line (left in LTR, right in RTL) */
+    padding-block-start: 0.5rem; /* Adapts to start of block (top in horizontal writing modes) */
+    border-inline-end: 2px solid blue; /* Adapts to end of line */
 }
 ```
 
@@ -266,55 +268,55 @@ Modern CSS introduces powerful selectors that enhance expressiveness and reduce 
 
 - **`:has()` (The "Parent Selector"):** Allows styling an element based on whether it contains a specific descendant.
 
-  ```css
-  /* Style a card if it contains an image */
-  .card:has(img) {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-  }
+    ```css
+    /* Style a card if it contains an image */
+    .card:has(img) {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+    }
 
-  /* Style a link if it contains an icon */
-  a:has(.icon) {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
-  }
-  ```
+    /* Style a link if it contains an icon */
+    a:has(.icon) {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5em;
+    }
+    ```
 
-  This selector opens up new possibilities for conditional styling directly in CSS, making markup cleaner and more semantic.
+    This selector opens up new possibilities for conditional styling directly in CSS, making markup cleaner and more semantic.
 
 - **`:is()`:** Allows grouping selectors to apply the same styles to multiple elements or states with less repetition and without increasing specificity.
 
-  ```css
-  /* Instead of: */
-  /* h1:hover, h2:hover, h3:hover { color: blue; } */
-  /* .button:hover, .link:hover { text-decoration: underline; } */
+    ```css
+    /* Instead of: */
+    /* h1:hover, h2:hover, h3:hover { color: blue; } */
+    /* .button:hover, .link:hover { text-decoration: underline; } */
 
-  /* Use :is() for conciseness: */
-  :is(h1, h2, h3):hover {
-    color: blue;
-  }
+    /* Use :is() for conciseness: */
+    :is(h1, h2, h3):hover {
+        color: blue;
+    }
 
-  :is(.button, .link):hover {
-    text-decoration: underline;
-  }
-  ```
+    :is(.button, .link):hover {
+        text-decoration: underline;
+    }
+    ```
 
-  The specificity of `:is()` is the specificity of its most specific argument.
+    The specificity of `:is()` is the specificity of its most specific argument.
 
 - **`:where()`:** Similar to `:is()`, but always has zero specificity. This is incredibly useful for creating highly reusable utility classes or generic styles that can be easily overridden.
-  ```css
-  /* Styles applied via :where() can be easily overridden by any other selector */
-  :where(h1, h2, h3) {
-    margin-top: 1em;
-    margin-bottom: 0.5em;
-  }
+    ```css
+    /* Styles applied via :where() can be easily overridden by any other selector */
+    :where(h1, h2, h3) {
+        margin-top: 1em;
+        margin-bottom: 0.5em;
+    }
 
-  /* This will easily override the :where() rule */
-  h2 {
-    margin-top: 2em;
-  }
-  ```
+    /* This will easily override the :where() rule */
+    h2 {
+        margin-top: 2em;
+    }
+    ```
 
 These advanced selectors make CSS more powerful, concise, and capable of handling complex styling logic natively, further reducing the reliance on preprocessors for basic features.
 
@@ -347,16 +349,16 @@ CSS Modules provide a solution by treating CSS files as modules, where all class
 
 ```css
 .button {
-  background-color: #007bff;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.3rem;
-  cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
 }
 
 .buttonPrimary {
-  background-color: #0056b3;
+    background-color: #0056b3;
 }
 ```
 
@@ -367,8 +369,8 @@ import React from 'react';
 import styles from './Button.module.css'; // Import the CSS module
 
 const Button = ({ children, primary }) => {
-  const buttonClass = primary ? styles.buttonPrimary : styles.button;
-  return <button className={buttonClass}>{children}</button>;
+    const buttonClass = primary ? styles.buttonPrimary : styles.button;
+    return <button className={buttonClass}>{children}</button>;
 };
 
 export default Button;
@@ -401,21 +403,21 @@ import React from 'react';
 import styled from 'styled-components';
 
 const StyledButton = styled.button`
-  background-color: ${(props) => (props.primary ? '#007bff' : '#6c757d')};
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.3rem;
-  cursor: pointer;
-  font-size: 1rem;
+    background-color: ${(props) => (props.primary ? '#007bff' : '#6c757d')};
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    font-size: 1rem;
 
-  &:hover {
-    background-color: ${(props) => (props.primary ? '#0056b3' : '#5a6268')};
-  }
+    &:hover {
+        background-color: ${(props) => (props.primary ? '#0056b3' : '#5a6268')};
+    }
 `;
 
 const Button = ({ children, primary }) => {
-  return <StyledButton primary={primary}>{children}</StyledButton>;
+    return <StyledButton primary={primary}>{children}</StyledButton>;
 };
 
 export default Button;
@@ -470,32 +472,37 @@ Critical CSS is the minimal set of CSS rules required to render the above-the-fo
 ```html
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-      /* Inlined Critical CSS for above-the-fold content */
-      body {
-        font-family: sans-serif;
-        margin: 0;
-      }
-      .header {
-        background: #f8f9fa;
-        padding: 1rem;
-      }
-      .hero-title {
-        font-size: 2.5rem;
-        color: #333;
-      }
-    </style>
-    <!-- Asynchronously load full CSS -->
-    <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
-    <noscript><link rel="stylesheet" href="styles.css" /></noscript>
-  </head>
-  <body>
-    <header class="header">
-      <h1 class="hero-title">Welcome to Our Site</h1>
-    </header>
-    <!-- Rest of the content -->
-  </body>
+    <head>
+        <style>
+            /* Inlined Critical CSS for above-the-fold content */
+            body {
+                font-family: sans-serif;
+                margin: 0;
+            }
+            .header {
+                background: #f8f9fa;
+                padding: 1rem;
+            }
+            .hero-title {
+                font-size: 2.5rem;
+                color: #333;
+            }
+        </style>
+        <!-- Asynchronously load full CSS -->
+        <link
+            rel="preload"
+            href="styles.css"
+            as="style"
+            onload="this.onload=null;this.rel='stylesheet'"
+        />
+        <noscript><link rel="stylesheet" href="styles.css" /></noscript>
+    </head>
+    <body>
+        <header class="header">
+            <h1 class="hero-title">Welcome to Our Site</h1>
+        </header>
+        <!-- Rest of the content -->
+    </body>
 </html>
 ```
 
@@ -513,14 +520,14 @@ The `content-visibility` CSS property allows user agents to skip rendering off-s
 ```css
 /* Apply to sections that are initially off-screen or in tabs */
 .off-screen-section {
-  content-visibility: auto;
-  contain-intrinsic-size: 500px 1000px; /* Important for preventing layout shifts */
+    content-visibility: auto;
+    contain-intrinsic-size: 500px 1000px; /* Important for preventing layout shifts */
 }
 
 /* Or for content that is explicitly hidden and shown via JS */
 .modal-content {
-  content-visibility: hidden; /* Hidden by default */
-  /* When shown, JS would toggle to 'visible' or 'auto' */
+    content-visibility: hidden; /* Hidden by default */
+    /* When shown, JS would toggle to 'visible' or 'auto' */
 }
 ```
 
@@ -534,13 +541,13 @@ The `will-change` CSS property provides a hint to the browser about what kinds o
 
 ```css
 .animated-box {
-  transition: transform 0.3s ease-out;
-  /* Hint to the browser that 'transform' will change */
-  will-change: transform;
+    transition: transform 0.3s ease-out;
+    /* Hint to the browser that 'transform' will change */
+    will-change: transform;
 }
 
 .animated-box:hover {
-  transform: scale(1.1);
+    transform: scale(1.1);
 }
 ```
 
@@ -561,13 +568,13 @@ The `contain` CSS property allows developers to isolate a subtree of the DOM fro
 
 ```css
 .isolated-component {
-  /* This component's internal changes won't trigger global layout/style recalculations */
-  contain: layout style;
-  /* If its size is fixed, add 'size' or 'strict' for even more isolation */
-  /* contain: strict; */
-  width: 300px;
-  height: 200px;
-  overflow: auto;
+    /* This component's internal changes won't trigger global layout/style recalculations */
+    contain: layout style;
+    /* If its size is fixed, add 'size' or 'strict' for even more isolation */
+    /* contain: strict; */
+    width: 300px;
+    height: 200px;
+    overflow: auto;
 }
 ```
 
@@ -597,21 +604,21 @@ The `:focus-visible` pseudo-class provides a more intelligent solution: it appli
 ```css
 /* Hide default focus outline for mouse users, but maintain for keyboard */
 *:focus {
-  outline: none; /* Remove browser default outline */
-  box-shadow: none; /* If using custom box-shadow for focus */
+    outline: none; /* Remove browser default outline */
+    box-shadow: none; /* If using custom box-shadow for focus */
 }
 
 *:focus-visible {
-  outline: 2px solid var(--primary-color); /* Custom, accessible focus indicator */
-  outline-offset: 2px;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.4);
+    outline: 2px solid var(--primary-color); /* Custom, accessible focus indicator */
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.4);
 }
 
 /* Example for a button */
 button:focus-visible {
-  border-color: var(--primary-color);
-  background-color: var(--primary-color-dark);
-  color: white;
+    border-color: var(--primary-color);
+    background-color: var(--primary-color-dark);
+    color: white;
 }
 ```
 
@@ -622,11 +629,11 @@ This ensures that keyboard users always have a clear visual cue, while mouse use
 Color contrast is critical for readability, especially for users with visual impairments. The Web Content Accessibility Guidelines (WCAG) specify minimum contrast ratios for text and background colors:
 
 - **AA Level:**
-  - Normal text: at least 4.5:1
-  - Large text (18pt or 14pt bold): at least 3:1
+    - Normal text: at least 4.5:1
+    - Large text (18pt or 14pt bold): at least 3:1
 - **AAA Level:**
-  - Normal text: at least 7:1
-  - Large text: at least 4.5:1
+    - Normal text: at least 7:1
+    - Large text: at least 4.5:1
 
 **Tools for Checking Contrast:**
 
@@ -642,8 +649,8 @@ Responsive design isn't just about adapting layouts for different screen sizes; 
 
 - **Fluid Layouts:** Use flexible units (`%`, `rem`, `em`, `vw`, `vh`) and CSS Grid/Flexbox to ensure content reflows gracefully.
 - **Respecting User Preferences:**
-  - **`prefers-reduced-motion`:** Reduce or disable animations for users who prefer less motion.
-  - **`prefers-color-scheme`:** Provide dark mode/light mode based on user system preference.
+    - **`prefers-reduced-motion`:** Reduce or disable animations for users who prefer less motion.
+    - **`prefers-color-scheme`:** Provide dark mode/light mode based on user system preference.
 - **Readability:** Ensure font sizes are adjustable, line heights are generous, and text never overflows its container.
 
 ### Semantic HTML as a Prerequisite for Accessible CSS
@@ -658,15 +665,15 @@ CSS should enhance, not compensate for, poor HTML structure. For example, visual
 
 ```css
 .visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
 }
 ```
 
