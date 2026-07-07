@@ -8,16 +8,21 @@ async function run() {
     const args = process.argv.slice(2);
     const command = args[0];
 
+    // Inside your 'ingest' block in index.js:
     if (command === 'ingest') {
-        console.log('\n🚀 Starting ingestion pipeline...');
-        const chunks = ingestDirectory('./knowledge');
+        console.log('\n Starting enterprise ingestion pipeline...');
+        
+        // Changed this line to take no arguments
+        const chunks = await ingestDirectory(); 
+        
         if (chunks.length > 0) {
             await addChunks(chunks);
-            console.log('Ingestion complete!');
+            console.log('\n All documents embedded and ingested successfully! Ready for querying.');
         } else {
-            console.log('No text found in knowledge/ directory.');
+            console.log('\n No valid files found from the manifest.');
         }
-    } 
+    }
+
     else if (command === 'ask') {
         const query = args.slice(1).join(' ');
         if (!query) {
@@ -28,7 +33,7 @@ async function run() {
         console.log(`\n Question: "${query}"`);
         
         // 1. Retrieve the clean data
-        const relevantChunks = await search(query);
+        const relevantChunks = await search(query, 30);
         
         // 2. Generate the answer
         const answer = await generateAnswer(query, relevantChunks);

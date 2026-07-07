@@ -5,7 +5,7 @@ import crypto from 'crypto';
 const client = new QdrantClient({ host: '127.0.0.1', port: 6333 });
 
 // Fresh collection name with the 768 size for Nomic
-const COLLECTION_NAME = 'knowledge_local'; 
+const COLLECTION_NAME = 'knowledge_local_2'; 
 const VECTOR_SIZE = 768; 
 
 export async function initCollection() {

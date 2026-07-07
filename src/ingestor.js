@@ -1,82 +1,85 @@
 import fs from 'fs';
 import path from 'path';
+import officeParser from 'officeparser';
+import pdf from 'pdf-parse-debugging-disabled'; // Clean PDF package
 
-const parsers = {
-    '.md': (content) => content, 
-    '.js': (content) => content, 
-    '.json': (content) => {
-        try {
-            return JSON.stringify(JSON.parse(content)); 
-        } catch (e) {
-            console.warn(`[Ingestor] Failed to parse JSON, returning raw text.`);
-            return content;
-        }
-    }
-};
+const pdfParse = pdf.default || pdf;
 
-// Chunk as per new line
-function chunkText(text, maxChunkSize = 1000) {
-    // 1. Split the text into logical blocks based on line breaks
-    const blocks = text.split(/\n+/); 
-    
+// 1. The Enterprise Manifest (Clean and Explicit)
+const TARGET_FILES = [
+    './knowledge/FrameworkUI.jsx',
+    './knowledge/swagger.yml',
+    './knowledge/Security_Compliance_Enterprise_2.pdf',
+    './knowledge/Backend_Implementation_Enterprise.docx',
+    './knowledge/Frontend_Architecture_v2_8_Slides.pptx'
+];
+
+function chunkText(text, maxChunkSize = 6000) {
+    const blocks = text.split(/\n+/);
     const chunks = [];
     let currentChunk = "";
-
     for (const block of blocks) {
-        // If adding the next block pushes us over the limit, save the current chunk and start a new one
         if (currentChunk.length + block.length > maxChunkSize && currentChunk.length > 0) {
             chunks.push(currentChunk.trim());
             currentChunk = "";
         }
-        
-        // Accumulate blocks
-        currentChunk += block + "\n"; 
+        currentChunk += block + "\n";
     }
-    
-    // Push the final leftover chunk
-    if (currentChunk.trim().length > 0) {
-        chunks.push(currentChunk.trim());
-    }
-    
+    if (currentChunk.trim().length > 0) chunks.push(currentChunk.trim());
     return chunks;
 }
 
-export function ingestDirectory(dirPath = './knowledge') {
-    console.log(`[Ingestor] Scanning directory: ${dirPath}...`);
-    
-    if (!fs.existsSync(dirPath)) {
-        console.warn(`[Ingestor] Directory ${dirPath} does not exist. Creating it...`);
-        fs.mkdirSync(dirPath, { recursive: true });
-        return [];
-    }
-
-    const files = fs.readdirSync(dirPath);
+export async function ingestDirectory() {
+    console.log(`[Ingestor] Starting Manifest-Driven Ingestion...`);
     const allChunks = [];
 
-    for (const file of files) {
-        const ext = path.extname(file);
-        const filePath = path.join(dirPath, file);
-        
-        if (fs.statSync(filePath).isDirectory() || !parsers[ext]) {
-            console.log(`[Ingestor] Skipping unsupported file/dir: ${file}`);
+    for (const filePath of TARGET_FILES) {
+        if (!fs.existsSync(filePath)) {
+            console.error(`[Ingestor] ⚠️ File not found, skipping: ${filePath}`);
             continue;
         }
 
-        const rawContent = fs.readFileSync(filePath, 'utf-8');
-        const cleanText = parsers[ext](rawContent);
-        
-        const textChunks = chunkText(cleanText);
+        const ext = path.extname(filePath).toLowerCase();
+        let rawText = "";
 
-        textChunks.forEach((chunk, index) => {
-            allChunks.push({
-                source: file,
-                chunkIndex: index,
-                content: chunk
+        try {
+            // 2. Streamlined Parsing Logic
+            if (['.js', '.jsx', '.ts', '.tsx', '.json', '.yaml', '.yml', '.md', '.txt'].includes(ext)) {
+                console.log(`[Ingestor] Parsing Code/Text: ${filePath}`);
+                rawText = fs.readFileSync(filePath, 'utf-8');
+            } 
+            else if (ext === '.pptx' || ext === '.docx') {
+                console.log(`[Ingestor] Parsing Office doc: ${filePath}`);
+                rawText = await officeParser.parseOfficeAsync(filePath);
+            } 
+            else if (ext === '.pdf') {
+                console.log(`[Ingestor] Parsing PDF: ${filePath}`);
+                const dataBuffer = fs.readFileSync(filePath);
+                const pdfData = await pdfParse(dataBuffer);
+                rawText = pdfData.text;
+            } 
+            else {
+                console.log(`[Ingestor] Skipping unsupported extension: ${ext}`);
+                continue; 
+            }
+
+            // 3. Anchor context and chunk
+            const fileContext = `File Location: ${filePath}\n\n`;
+            const textChunks = chunkText(fileContext + rawText);
+
+            textChunks.forEach((chunk, index) => {
+                allChunks.push({
+                    source: filePath, 
+                    chunkIndex: index,
+                    content: chunk
+                });
             });
-        });
-        
-        console.log(`[Ingestor] Parsed ${file} into ${textChunks.length} chunks.`);
+
+        } catch (error) {
+            console.error(`[Ingestor] ❌ Failed to parse ${filePath}:`, error.message);
+        }
     }
     
+    console.log(`[Ingestor] ✅ Generated ${allChunks.length} chunks from the manifest.`);
     return allChunks;
 }
