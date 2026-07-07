@@ -152,14 +152,14 @@ graph TD
 **When to Choose Which:**
 
 - **Embed** when:
-  - The relationship is One-to-One or One-to-Few (e.g., a book has a single publisher, an order has a few line items).
-  - The embedded data is frequently accessed with its parent.
-  - Updates to the embedded data need to be atomic with the parent document.
-  - The embedded data doesn't exceed the 16MB document limit.
+    - The relationship is One-to-One or One-to-Few (e.g., a book has a single publisher, an order has a few line items).
+    - The embedded data is frequently accessed with its parent.
+    - Updates to the embedded data need to be atomic with the parent document.
+    - The embedded data doesn't exceed the 16MB document limit.
 - **Reference** when:
-  - The relationship is One-to-Many or Many-to-Many, and the "many" side can be unbounded (e.g., users and blog posts, tags and products).
-  - The related data is large or frequently updated independently.
-  - You need to avoid data duplication for entities that change often.
+    - The relationship is One-to-Many or Many-to-Many, and the "many" side can be unbounded (e.g., users and blog posts, tags and products).
+    - The related data is large or frequently updated independently.
+    - You need to avoid data duplication for entities that change often.
 
 The key is to model data based on how your application _accesses_ it, prioritizing read performance for common paths while managing the trade-offs.
 
@@ -235,9 +235,9 @@ Compound indexes are defined on multiple fields (e.g., `{ 'userId': 1, 'timestam
 **Design Considerations:**
 
 - **Equality, Sort, Range (ESR) Rule:** A good heuristic for ordering fields in a compound index:
-  1.  **Equality:** Fields used for exact matches first (e.g., `status: 'active'`).
-  2.  **Sort:** Fields used for sorting next (e.g., `timestamp: -1`).
-  3.  **Range:** Fields used for range queries last (e.g., `price: { $gt: 100 }`).
+    1.  **Equality:** Fields used for exact matches first (e.g., `status: 'active'`).
+    2.  **Sort:** Fields used for sorting next (e.g., `timestamp: -1`).
+    3.  **Range:** Fields used for range queries last (e.g., `price: { $gt: 100 }`).
 - **Prefix Optimization:** A compound index on `{ a: 1, b: 1, c: 1 }` can satisfy queries on `a`, `a` and `b`, or `a`, `b`, and `c`. A query only on `b` or `c` will not efficiently use this index.
 - **Sort Optimization:** If a query includes a sort operation, a compound index can satisfy the sort if the sort order matches the index order (or the reverse order). For example, `db.collection.find({userId: 123}).sort({timestamp: -1})` would use `{ userId: 1, timestamp: -1 }`.
 
@@ -248,7 +248,9 @@ Create a compound index for queries that find orders for a specific customer, so
 db.orders.createIndex({ customerId: 1, orderDate: -1 });
 
 // This query can use the index efficiently:
-db.orders.find({ customerId: 'CUST-001', orderDate: { $gte: ISODate('2023-01-01') } }).sort({ orderDate: -1 });
+db.orders
+    .find({ customerId: 'CUST-001', orderDate: { $gte: ISODate('2023-01-01') } })
+    .sort({ orderDate: -1 });
 
 // This query can also use the index (prefix match):
 db.orders.find({ customerId: 'CUST-001' });
@@ -262,7 +264,10 @@ Partial indexes only index documents in a collection that satisfy a specified fi
 Index only active users for faster lookups, reducing the index size compared to indexing all users.
 
 ```javascript
-db.users.createIndex({ status: 1, lastLogin: -1 }, { partialFilterExpression: { status: 'active' } });
+db.users.createIndex(
+    { status: 1, lastLogin: -1 },
+    { partialFilterExpression: { status: 'active' } }
+);
 
 // This query will use the partial index:
 db.users.find({ status: 'active', lastLogin: { $gte: ISODate('2023-10-01') } });
@@ -280,8 +285,8 @@ Automatically delete logs older than 30 days.
 
 ```javascript
 db.log_events.createIndex(
-  { createdAt: 1 },
-  { expireAfterSeconds: 60 * 60 * 24 * 30 }, // 30 days
+    { createdAt: 1 },
+    { expireAfterSeconds: 60 * 60 * 24 * 30 } // 30 days
 );
 ```
 
@@ -305,7 +310,9 @@ db.tasks.createIndex({ userId: 1, status: 1 });
 db.tasks.find({ userId: 'user123', status: 'pending' }, { userId: 1, status: 1, _id: 0 });
 
 // Using explain() to verify:
-db.tasks.find({ userId: 'user123', status: 'pending' }, { userId: 1, status: 1, _id: 0 }).explain('executionStats');
+db.tasks
+    .find({ userId: 'user123', status: 'pending' }, { userId: 1, status: 1, _id: 0 })
+    .explain('executionStats');
 // Look for "COLLSCAN": false and "IXSCAN" in winningPlan, and "totalDocsExamined": 0.
 ```
 
@@ -352,8 +359,8 @@ The primary goal of a shard key is to distribute data evenly across all shards.
 
 - **Good Shard Key:** A high-cardinality field with a uniform distribution of values (e.g., `user_id` if users are evenly distributed, or a compound key including a unique or random component). This prevents 'hot spots' where all new writes or a disproportionate number of reads hit a single shard, maximizing parallel processing.
 - **Bad Shard Key (Hot Spots):**
-  - **Monotonically Increasing/Decreasing Key:** A shard key like `timestamp` or `_id` (default `ObjectId` is time-based) can lead to all new inserts going to the same shard, creating a write hot spot.
-  - **Low-Cardinality Key:** A key with few distinct values (e.g., `status` field with 'active'/'inactive') will result in data being heavily concentrated on a few shards, leading to hot spots for reads and writes on those shards.
+    - **Monotonically Increasing/Decreasing Key:** A shard key like `timestamp` or `_id` (default `ObjectId` is time-based) can lead to all new inserts going to the same shard, creating a write hot spot.
+    - **Low-Cardinality Key:** A key with few distinct values (e.g., `status` field with 'active'/'inactive') will result in data being heavily concentrated on a few shards, leading to hot spots for reads and writes on those shards.
 
 ### Efficient Query Routing vs. Scatter-Gather Queries
 
@@ -423,11 +430,11 @@ A `product` document with various specifications.
 **Performance Rationale:**
 
 - **Indexing:** A single compound index on `specifications.k` and `specifications.v` can efficiently query across all attributes.
-  ```javascript
-  db.products.createIndex({ 'specifications.k': 1, 'specifications.v': 1 });
-  // Query for products with 32GB RAM:
-  db.products.find({ specifications: { $elemMatch: { k: 'RAM', v: '32GB' } } });
-  ```
+    ```javascript
+    db.products.createIndex({ 'specifications.k': 1, 'specifications.v': 1 });
+    // Query for products with 32GB RAM:
+    db.products.find({ specifications: { $elemMatch: { k: 'RAM', v: '32GB' } } });
+    ```
 - **Flexibility:** Easily add new specifications without schema migration.
 - **Sparse Attributes:** Avoids documents with many null or undefined fields.
 
@@ -476,11 +483,14 @@ Sensor readings for a single device, grouped into hourly buckets.
 - **Improved Data Locality:** All readings for a specific hour are in one document, improving cache efficiency for time-range queries.
 - **Pre-Aggregation:** Common aggregations (min, max, avg) can be stored directly in the bucket document, reducing computation at query time.
 - **Efficient Indexing:** Indexing `device_id` and `timestamp_hour` allows for quick retrieval of buckets.
-  ```javascript
-  db.sensor_data_hourly.createIndex({ device_id: 1, timestamp_hour: 1 });
-  // Query for all readings for a device during a specific hour:
-  db.sensor_data_hourly.find({ device_id: 'SENSOR-001', timestamp_hour: ISODate('2023-10-26T10:00:00Z') });
-  ```
+    ```javascript
+    db.sensor_data_hourly.createIndex({ device_id: 1, timestamp_hour: 1 });
+    // Query for all readings for a device during a specific hour:
+    db.sensor_data_hourly.find({
+        device_id: 'SENSOR-001',
+        timestamp_hour: ISODate('2023-10-26T10:00:00Z'),
+    });
+    ```
 
 **Conceptual Diagram: Bucket Pattern**
 
@@ -577,14 +587,14 @@ graph TD
 ### Impact of Document Size on Memory Utilization and I/O
 
 - **Larger Documents:**
-  - **Higher Memory Footprint:** Each document consumes more memory, meaning fewer documents can fit into RAM. This reduces the effective working set size.
-  - **Increased I/O:** If only a small part of a large document is needed, the entire document must still be read from disk into memory. This leads to inefficient I/O, as unnecessary data is loaded.
-  - **Slower Reads/Writes:** Reading and writing larger documents inherently take more time due to the increased data volume.
-  - **Higher Write Amplification:** Updates to large documents are more likely to cause the document to be relocated on disk if it grows, leading to increased I/O.
+    - **Higher Memory Footprint:** Each document consumes more memory, meaning fewer documents can fit into RAM. This reduces the effective working set size.
+    - **Increased I/O:** If only a small part of a large document is needed, the entire document must still be read from disk into memory. This leads to inefficient I/O, as unnecessary data is loaded.
+    - **Slower Reads/Writes:** Reading and writing larger documents inherently take more time due to the increased data volume.
+    - **Higher Write Amplification:** Updates to large documents are more likely to cause the document to be relocated on disk if it grows, leading to increased I/O.
 - **Smaller, Focused Documents:**
-  - **Better Working Set Utilization:** More documents can fit into RAM, increasing the likelihood of cache hits and reducing costly disk I/O.
-  - **Faster Individual Document Operations:** Less data to read/write for single document operations.
-  - **Improved Cache Efficiency:** Individual documents are more likely to be cached entirely, leading to higher cache hit rates.
+    - **Better Working Set Utilization:** More documents can fit into RAM, increasing the likelihood of cache hits and reducing costly disk I/O.
+    - **Faster Individual Document Operations:** Less data to read/write for single document operations.
+    - **Improved Cache Efficiency:** Individual documents are more likely to be cached entirely, leading to higher cache hit rates.
 
 ### Trade-offs Between Smaller, Focused Documents and Larger, Embedded Documents
 

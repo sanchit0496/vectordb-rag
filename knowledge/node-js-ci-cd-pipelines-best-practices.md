@@ -57,41 +57,41 @@ name: Node.js CI
 on: [push, pull_request]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20' # Specify your Node.js version
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20' # Specify your Node.js version
 
-      - name: Cache Node.js modules
-        id: cache-node-modules
-        uses: actions/cache@v4
-        with:
-          # Path to cache. For npm, this is typically ~/.npm or node_modules.
-          # For Yarn, it's ~/.cache/yarn. For pnpm, it's ~/.local/share/pnpm/store.
-          # Adjust based on your package manager and caching strategy.
-          path: |
-            node_modules
-            ~/.npm
-          # Cache key based on OS, Node.js version, and lock file hash
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+            - name: Cache Node.js modules
+              id: cache-node-modules
+              uses: actions/cache@v4
+              with:
+                  # Path to cache. For npm, this is typically ~/.npm or node_modules.
+                  # For Yarn, it's ~/.cache/yarn. For pnpm, it's ~/.local/share/pnpm/store.
+                  # Adjust based on your package manager and caching strategy.
+                  path: |
+                      node_modules
+                      ~/.npm
+                  # Cache key based on OS, Node.js version, and lock file hash
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
 
-      - name: Install dependencies
-        # Using 'npm ci' for deterministic builds
-        run: npm ci --prefer-offline --no-audit
+            - name: Install dependencies
+              # Using 'npm ci' for deterministic builds
+              run: npm ci --prefer-offline --no-audit
 
-      - name: Run tests
-        run: npm test
+            - name: Run tests
+              run: npm test
 
-    # ... other steps like build, lint, etc.
+        # ... other steps like build, lint, etc.
 ```
 
 **Key considerations for caching:**
@@ -196,16 +196,16 @@ CMD ["npm", "start"]
 
 - **Minimal Base Images**: For the `runner` stage, prioritize minimal base images like `node:alpine` or even `distroless`. `alpine` is a lightweight Linux distribution, significantly reducing image size. `distroless` images contain only your application and its runtime dependencies, offering maximum security and a minimal footprint by excluding shell, package managers, and other utilities.
 - **`.dockerignore`**: Create a `.dockerignore` file in your project root to exclude unnecessary files and directories from the Docker build context. This reduces the context size sent to the Docker daemon and speeds up builds.
-  ```
-  node_modules
-  .git
-  .env
-  .vscode/
-  dist/ # if your build output is elsewhere and you only copy specific files
-  coverage/
-  *.log
-  npm-debug.log*
-  ```
+    ```
+    node_modules
+    .git
+    .env
+    .vscode/
+    dist/ # if your build output is elsewhere and you only copy specific files
+    coverage/
+    *.log
+    npm-debug.log*
+    ```
 
 #### 3. Leveraging Docker Layer Caching
 
@@ -275,14 +275,14 @@ A comprehensive testing strategy is the backbone of a reliable CI/CD pipeline. F
 As your test suite grows, execution time can become a bottleneck. Parallelizing tests is essential to maintain fast feedback loops.
 
 - **Within Test Runners**: Many Node.js test runners (e.g., Jest) support parallel execution of test files or suites across multiple CPU cores.
-  ```json
-  // package.json scripts example for Jest
-  {
-    "scripts": {
-      "test": "jest --maxWorkers=50%" // Use 50% of available CPU cores
+    ```json
+    // package.json scripts example for Jest
+    {
+        "scripts": {
+            "test": "jest --maxWorkers=50%" // Use 50% of available CPU cores
+        }
     }
-  }
-  ```
+    ```
 - **Across CI Agents**: For very large test suites, CI/CD platforms can distribute test jobs across multiple agents. This often involves splitting tests into different groups (e.g., using test splitting tools or custom scripting) and running each group on a separate runner concurrently.
 
 ### Integrating Static Analysis Tools
@@ -309,18 +309,18 @@ To provide immediate feedback to developers, integrate static analysis and basic
 ```json
 // package.json example for husky and lint-staged
 {
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.{js,jsx,ts,tsx}": [
+            "eslint --fix",
+            "prettier --write",
+            "jest --findRelatedTests" // Run tests only on staged files
+        ]
     }
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write",
-      "jest --findRelatedTests" // Run tests only on staged files
-    ]
-  }
 }
 ```
 
@@ -346,8 +346,8 @@ const API_KEY = process.env.API_KEY;
 const DB_PASSWORD = process.env.DB_PASSWORD;
 
 if (!API_KEY) {
-  console.error('API_KEY environment variable is not set!');
-  process.exit(1);
+    console.error('API_KEY environment variable is not set!');
+    process.exit(1);
 }
 ```
 
@@ -434,10 +434,10 @@ Manual version bumping and release note generation are tedious and error-prone. 
 
 - **Conventional Commits**: Enforce a standardized commit message format (e.g., `feat: add new feature`, `fix: fix a bug`, `chore: update dependencies`).
 - **Semantic Release**: This powerful tool analyzes your conventional commits to automatically:
-  - Determine the next semantic version (patch, minor, or major).
-  - Generate comprehensive release notes.
-  - Publish new versions to npm or other package registries.
-  - Create Git tags and releases on your repository.
+    - Determine the next semantic version (patch, minor, or major).
+    - Generate comprehensive release notes.
+    - Publish new versions to npm or other package registries.
+    - Create Git tags and releases on your repository.
 
 This ensures consistent versioning, clear communication about changes, and facilitates easier management of deployments and rollbacks.
 
@@ -464,12 +464,12 @@ Example `/healthz` endpoint in Express.js:
 
 ```javascript
 app.get('/healthz', (req, res) => {
-  // Perform basic checks, e.g., database connection status
-  if (db.isConnected()) {
-    res.status(200).send('OK');
-  } else {
-    res.status(500).send('Database not connected');
-  }
+    // Perform basic checks, e.g., database connection status
+    if (db.isConnected()) {
+        res.status(200).send('OK');
+    } else {
+        res.status(500).send('Database not connected');
+    }
 });
 ```
 

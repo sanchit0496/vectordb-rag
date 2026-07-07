@@ -149,78 +149,78 @@ Excessive re-renders are a common performance killer. React provides several too
 - **`React.memo` (for Functional Components)**:
   Wraps a functional component and memoizes its render output. The component will only re-render if its props have shallowly changed.
 
-  ```typescript
-  import React from 'react';
-  import { Text, View } from 'react-native';
+    ```typescript
+    import React from 'react';
+    import { Text, View } from 'react-native';
 
-  type ItemProps = {
-    title: string;
-    onPress: () => void;
-  };
+    type ItemProps = {
+      title: string;
+      onPress: () => void;
+    };
 
-  const MyItem = ({ title, onPress }: ItemProps) => {
-    console.log('Rendering MyItem:', title);
-    return (
-      <View>
-        <Text>{title}</Text>
-        {/* ... other UI ... */}
-      </View>
-    );
-  };
+    const MyItem = ({ title, onPress }: ItemProps) => {
+      console.log('Rendering MyItem:', title);
+      return (
+        <View>
+          <Text>{title}</Text>
+          {/* ... other UI ... */}
+        </View>
+      );
+    };
 
-  // Memoize the component
-  export const MemoizedMyItem = React.memo(MyItem);
-  ```
+    // Memoize the component
+    export const MemoizedMyItem = React.memo(MyItem);
+    ```
 
 - **`useCallback` (for Memoizing Functions)**:
   Returns a memoized callback function. It only re-creates the function if one of its dependencies changes. Crucial when passing callbacks to memoized child components to prevent unnecessary re-renders of the child.
 
-  ```typescript
-  import React, { useState, useCallback } from 'react';
-  import { Button, View } from 'react-native';
-  import { MemoizedMyItem } from './MemoizedMyItem'; // Assume this is the memoized component
+    ```typescript
+    import React, { useState, useCallback } from 'react';
+    import { Button, View } from 'react-native';
+    import { MemoizedMyItem } from './MemoizedMyItem'; // Assume this is the memoized component
 
-  const ParentComponent = () => {
-    const [count, setCount] = useState(0);
+    const ParentComponent = () => {
+      const [count, setCount] = useState(0);
 
-    // This function will only be re-created if `count` changes.
-    // If MemoizedMyItem has `onPress` as a prop, this prevents it from re-rendering
-    // when ParentComponent re-renders due to other state changes.
-    const handlePressItem = useCallback(() => {
-      console.log('Item pressed! Count:', count);
-    }, [count]);
+      // This function will only be re-created if `count` changes.
+      // If MemoizedMyItem has `onPress` as a prop, this prevents it from re-rendering
+      // when ParentComponent re-renders due to other state changes.
+      const handlePressItem = useCallback(() => {
+        console.log('Item pressed! Count:', count);
+      }, [count]);
 
-    return (
-      <View>
-        <Button title="Increment Count" onPress={() => setCount(c => c + 1)} />
-        <MemoizedMyItem title={`Current Count: ${count}`} onPress={handlePressItem} />
-        {/* Other components that don't depend on count */}
-      </View>
-    );
-  };
-  ```
+      return (
+        <View>
+          <Button title="Increment Count" onPress={() => setCount(c => c + 1)} />
+          <MemoizedMyItem title={`Current Count: ${count}`} onPress={handlePressItem} />
+          {/* Other components that don't depend on count */}
+        </View>
+      );
+    };
+    ```
 
 - **`useMemo` (for Memoizing Values)**:
   Returns a memoized value. It only re-computes the value if one of its dependencies changes. Useful for expensive calculations or creating object/array references that shouldn't change across renders.
 
-  ```typescript
-  import React, { useMemo } from 'react';
-  import { Text } from 'react-native';
+    ```typescript
+    import React, { useMemo } from 'react';
+    import { Text } from 'react-native';
 
-  type DataListProps = {
-    data: number[];
-  };
+    type DataListProps = {
+      data: number[];
+    };
 
-  const DataList = ({ data }: DataListProps) => {
-    // Expensive computation that should only run when `data` changes
-    const sum = useMemo(() => {
-      console.log('Calculating sum...');
-      return data.reduce((acc, num) => acc + num, 0);
-    }, [data]);
+    const DataList = ({ data }: DataListProps) => {
+      // Expensive computation that should only run when `data` changes
+      const sum = useMemo(() => {
+        console.log('Calculating sum...');
+        return data.reduce((acc, num) => acc + num, 0);
+      }, [data]);
 
-    return <Text>Sum of data: {sum}</Text>;
-  };
-  ```
+      return <Text>Sum of data: {sum}</Text>;
+    };
+    ```
 
 **Caution**: Over-memoization can introduce its own overhead. Use these tools judiciously, focusing on components that are known to cause performance issues or receive frequently changing props.
 
@@ -230,29 +230,29 @@ Excessive re-renders are a common performance killer. React provides several too
 
 - **`keyExtractor`**: Provides a unique key for each item, allowing React to efficiently track item changes, additions, or removals. **This is mandatory for performance.**
 
-  ```typescript
-  <FlatList
-    data={myItems}
-    keyExtractor={(item) => item.id.toString()} // Ensure keys are unique strings
-    renderItem={({ item }) => <MyListItem item={item} />}
-  />
-  ```
+    ```typescript
+    <FlatList
+      data={myItems}
+      keyExtractor={(item) => item.id.toString()} // Ensure keys are unique strings
+      renderItem={({ item }) => <MyListItem item={item} />}
+    />
+    ```
 
 - **`getItemLayout`**: Allows `FlatList` to skip measuring items, significantly improving initial render and scroll performance, especially for lists with fixed-height items.
 
-  ```typescript
-  const ITEM_HEIGHT = 100;
-  <FlatList
-    data={myItems}
-    keyExtractor={(item) => item.id.toString()}
-    getItemLayout={(data, index) => ({
-      length: ITEM_HEIGHT,
-      offset: ITEM_HEIGHT * index,
-      index,
-    })}
-    renderItem={({ item }) => <MyListItem item={item} />}
-  />
-  ```
+    ```typescript
+    const ITEM_HEIGHT = 100;
+    <FlatList
+      data={myItems}
+      keyExtractor={(item) => item.id.toString()}
+      getItemLayout={(data, index) => ({
+        length: ITEM_HEIGHT,
+        offset: ITEM_HEIGHT * index,
+        index,
+      })}
+      renderItem={({ item }) => <MyListItem item={item} />}
+    />
+    ```
 
 - **`windowSize`, `maxToRenderPerBatch`, `updateCellsBatchingPeriod`**: These props control how many items are rendered outside the visible area and how frequently new items are rendered during scrolling. Adjusting them can balance memory usage and scroll smoothness.
 - **Memoize `renderItem` Components**: Ensure the component rendered by `renderItem` is memoized (e.g., using `React.memo`) to prevent re-renders of individual list items when the `FlatList` itself re-renders but the item's data hasn't changed.
@@ -593,9 +593,9 @@ A robust testing strategy is fundamental for building reliable, maintainable, an
 - **Focus**: Smallest units of code (functions, utility classes, reducers).
 - **Advantages**: Fast execution, isolated testing, easy to set up.
 - **Best Practices**:
-  - Test pure functions for predictable output.
-  - Mock external dependencies (API calls, native modules) to keep tests isolated.
-  - Use `describe`, `it`/`test`, `expect` for clear test structure.
+    - Test pure functions for predictable output.
+    - Mock external dependencies (API calls, native modules) to keep tests isolated.
+    - Use `describe`, `it`/`test`, `expect` for clear test structure.
 
 ```typescript
 // utils/math.ts
@@ -605,11 +605,11 @@ export const add = (a: number, b: number) => a + b;
 import { add } from '../../utils/math';
 
 describe('math utilities', () => {
-  it('should correctly add two numbers', () => {
-    expect(add(1, 2)).toBe(3);
-    expect(add(-1, 1)).toBe(0);
-    expect(add(0, 0)).toBe(0);
-  });
+    it('should correctly add two numbers', () => {
+        expect(add(1, 2)).toBe(3);
+        expect(add(-1, 1)).toBe(0);
+        expect(add(0, 0)).toBe(0);
+    });
 });
 ```
 
@@ -620,9 +620,9 @@ describe('math utilities', () => {
 - **Focus**: Individual components or small groups of components interacting together.
 - **Advantages**: Tests are resilient to refactoring, promotes accessibility by querying elements the way users perceive them, provides high confidence in UI behavior.
 - **Best Practices**:
-  - Query elements by `testID`, `accessibilityLabel`, `Text` content, or `Role`.
-  - Use `fireEvent` to simulate user interactions (press, change text).
-  - Use `waitFor` and `findBy*` queries for asynchronous updates.
+    - Query elements by `testID`, `accessibilityLabel`, `Text` content, or `Role`.
+    - Use `fireEvent` to simulate user interactions (press, change text).
+    - Use `waitFor` and `findBy*` queries for asynchronous updates.
 
 ```typescript
 // components/MyButton.tsx
@@ -683,10 +683,10 @@ describe('MyButton', () => {
 - **Advantages**: Highest confidence in overall application functionality, catches integration issues that unit/component tests might miss.
 - **Disadvantages**: Slowest to run, most fragile (prone to flakiness), highest maintenance cost.
 - **Best Practices**:
-  - Focus on critical user journeys, not every single interaction.
-  - Use `testID`s for stable element selection.
-  - Ensure a clean state before each test (e.g., reset app data, log out).
-  - Integrate into CI/CD pipeline.
+    - Focus on critical user journeys, not every single interaction.
+    - Use `testID`s for stable element selection.
+    - Ensure a clean state before each test (e.g., reset app data, log out).
+    - Integrate into CI/CD pipeline.
 
 ### Mocking Native Modules for Testing
 
@@ -740,15 +740,15 @@ React Native components map to native UI elements, but developers must explicitl
 - **`accessible` (boolean)**: Indicates whether a view is an accessibility element. If `true`, the view and its children are treated as a single selectable item by screen readers.
 - **`accessibilityLabel` (string)**: Provides a descriptive text for screen readers. Essential for non-textual elements like icons or images.
 
-  ```typescript
-  <TouchableOpacity
-    onPress={onPress}
-    accessibilityLabel="Go back to the previous screen"
-    accessibilityRole="button"
-  >
-    <Image source={backIcon} />
-  </TouchableOpacity>
-  ```
+    ```typescript
+    <TouchableOpacity
+      onPress={onPress}
+      accessibilityLabel="Go back to the previous screen"
+      accessibilityRole="button"
+    >
+      <Image source={backIcon} />
+    </TouchableOpacity>
+    ```
 
 - **`accessibilityRole` (string)**: Describes the purpose of a component to assistive technologies (e.g., `'button'`, `'link'`, `'header'`, `'text'`, `'image'`).
 - **`accessibilityHint` (string)**: Provides additional context about what happens when an action is performed on the component.
@@ -769,27 +769,27 @@ Internationalization involves adapting your application to different languages a
 
 - **Externalize Strings**: Never hardcode text directly in components. Use a dedicated i18n library (e.g., `react-i18next`, `i18n-js`) to manage translations.
 
-  ```typescript
-  // en.json
-  {
-    "welcome": "Welcome, {{name}}!",
-    "button.submit": "Submit"
-  }
+    ```typescript
+    // en.json
+    {
+      "welcome": "Welcome, {{name}}!",
+      "button.submit": "Submit"
+    }
 
-  // fr.json
-  {
-    "welcome": "Bienvenue, {{name}} !",
-    "button.submit": "Soumettre"
-  }
+    // fr.json
+    {
+      "welcome": "Bienvenue, {{name}} !",
+      "button.submit": "Soumettre"
+    }
 
-  // In component
-  import { useTranslation } from 'react-i18next';
+    // In component
+    import { useTranslation } from 'react-i18next';
 
-  const MyScreen = ({ userName }) => {
-    const { t } = useTranslation();
-    return <Text>{t('welcome', { name: userName })}</Text>;
-  };
-  ```
+    const MyScreen = ({ userName }) => {
+      const { t } = useTranslation();
+      return <Text>{t('welcome', { name: userName })}</Text>;
+    };
+    ```
 
 - **Pluralization**: Handle different plural forms correctly for various languages.
 - **Date, Time, and Number Formatting**: Use locale-aware formatting for dates, times, currencies, and numbers. JavaScript's `Intl` API is useful here.
@@ -800,13 +800,13 @@ Internationalization involves adapting your application to different languages a
 For languages like Arabic, Hebrew, and Persian, text flows from right to left. React Native's `I18nManager` API and flexible styling are crucial.
 
 - **`I18nManager` API**:
-  - `I18nManager.isRTL`: Checks if the current locale is RTL.
-  - `I18nManager.allowRTL(true)`: Enables RTL layout.
-  - `I18nManager.forceRTL(true)`: Forces RTL layout (requires app restart).
+    - `I18nManager.isRTL`: Checks if the current locale is RTL.
+    - `I18nManager.allowRTL(true)`: Enables RTL layout.
+    - `I18nManager.forceRTL(true)`: Forces RTL layout (requires app restart).
 - **Flexible Styling**:
-  - Use `flexDirection: 'row'` (which becomes `'row-reverse'` in RTL) rather than fixed `left`/`right` properties where possible.
-  - Use `marginStart`/`marginEnd`, `paddingStart`/`paddingEnd` instead of `marginLeft`/`marginRight`, `paddingLeft`/`paddingRight`. These automatically flip in RTL.
-  - `textAlign: 'left'` becomes `'right'` in RTL when `I18nManager.isRTL` is true, and vice-versa.
+    - Use `flexDirection: 'row'` (which becomes `'row-reverse'` in RTL) rather than fixed `left`/`right` properties where possible.
+    - Use `marginStart`/`marginEnd`, `paddingStart`/`paddingEnd` instead of `marginLeft`/`marginRight`, `paddingLeft`/`paddingRight`. These automatically flip in RTL.
+    - `textAlign: 'left'` becomes `'right'` in RTL when `I18nManager.isRTL` is true, and vice-versa.
 - **Icon Mirroring**: Mirror icons that represent direction (e.g., back arrows) in RTL layouts.
 
 ```typescript

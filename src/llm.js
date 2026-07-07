@@ -8,15 +8,16 @@ export async function generateAnswer(query, contextChunks) {
 
     // XML Framing for Context to prevent prompt injection/hallucinations
     const contextText = contextChunks
-        .map((chunk, i) => `<document index="${i + 1}" source="${chunk.source}">\n${chunk.content}\n</document>`)
+        .map(
+            (chunk, i) =>
+                `<document index="${i + 1}" source="${chunk.source}">\n${chunk.content}\n</document>`
+        )
         .join('\n\n');
-    
-    // To get reference of the documents used in the answer, we can extract unique sources from the contextChunks
-        const references = [
-    ...new Set(contextChunks.map(chunk => chunk.source))
-];
 
-  const systemPrompt = `
+    // To get reference of the documents used in the answer, we can extract unique sources from the contextChunks
+    const references = [...new Set(contextChunks.map((chunk) => chunk.source))];
+
+    const systemPrompt = `
 You are an expert engineering assistant for the Developer Knowledge Portal.
 
 Your purpose is to answer questions using ONLY the information provided inside the <context> section.
@@ -56,8 +57,10 @@ ${contextText}
 `;
 
     try {
-        console.log(`[LLM] Requesting local completion from Llama 3.1 grounded on ${contextChunks.length} documents...`);
-        
+        console.log(
+            `[LLM] Requesting local completion from Llama 3.1 grounded on ${contextChunks.length} documents...`
+        );
+
         // 3. Hit the local Ollama API
         const response = await ollama.generate({
             model: 'llama3.1',
@@ -65,16 +68,16 @@ ${contextText}
             system: systemPrompt,
             options: {
                 temperature: 0, // 0 = zero creativity, strictly deterministic
-                top_p: 0.1
-            }
+                top_p: 0.1,
+            },
         });
-        
-return {
-    answer: response.response,
-    references
-};        
+
+        return {
+            answer: response.response,
+            references,
+        };
     } catch (error) {
         console.error(`\n[LLM] Local API Error: ${error.message}`);
-        return "System Error: Failed to generate an answer locally.";
+        return 'System Error: Failed to generate an answer locally.';
     }
 }
