@@ -14,14 +14,30 @@ const parsers = {
     }
 };
 
-// Sliding window chunking
-function chunkText(text, chunkSize = 1000, overlap = 200) {
+// Chunk as per new line
+function chunkText(text, maxChunkSize = 1000) {
+    // 1. Split the text into logical blocks based on line breaks
+    const blocks = text.split(/\n+/); 
+    
     const chunks = [];
-    let i = 0;
-    while (i < text.length) {
-        chunks.push(text.slice(i, i + chunkSize));
-        i += (chunkSize - overlap);
+    let currentChunk = "";
+
+    for (const block of blocks) {
+        // If adding the next block pushes us over the limit, save the current chunk and start a new one
+        if (currentChunk.length + block.length > maxChunkSize && currentChunk.length > 0) {
+            chunks.push(currentChunk.trim());
+            currentChunk = "";
+        }
+        
+        // Accumulate blocks
+        currentChunk += block + "\n"; 
     }
+    
+    // Push the final leftover chunk
+    if (currentChunk.trim().length > 0) {
+        chunks.push(currentChunk.trim());
+    }
+    
     return chunks;
 }
 

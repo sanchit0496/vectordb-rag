@@ -51,6 +51,7 @@ export async function addChunks(chunks) {
     const points = [];
     for (const chunk of chunks) {
         const vector = await generateEmbedding(chunk.content);
+        console.log(vector);
         
         points.push({
             id: crypto.randomUUID(), 
@@ -70,4 +71,24 @@ export async function addChunks(chunks) {
     });
     
     console.log(`[VectorStore] Successfully committed vectors to Qdrant.`);
+}
+
+
+export async function search(queryText, topK = 3) {
+    console.log(`\n[VectorStore] Embedding query...`);
+    const queryVector = await generateEmbedding(queryText);
+    
+    console.log(`[VectorStore] Searching Qdrant for top ${topK} matches...`);
+    const searchResults = await client.search(COLLECTION_NAME, {
+        vector: queryVector,
+        limit: topK,
+        with_payload: true, // We need the text back, not just the math
+    });
+
+    // Return a clean array of the text and the similarity score
+    return searchResults.map(result => ({
+        source: result.payload.source,
+        content: result.payload.content,
+        score: result.score
+    }));
 }
