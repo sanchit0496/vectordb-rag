@@ -1,0 +1,26 @@
+{
+  "name": "vectordb-rag",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Adding",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sanchit0496/vectordb-rag.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sanchit0496/vectordb-rag/issues"
+  },
+  "homepage": "https://github.com/sanchit0496/vectordb-rag#readme",
+  "dependencies": {
+    "@google/genai": "^2.10.0",
+    "@qdrant/js-client-rest": "^1.18.0",
+    "dotenv": "^17.4.2"
+  }
+}
