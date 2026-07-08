@@ -174,6 +174,35 @@ node index.js ask "What frameworks does the Developer Knowledge Portal support?"
 
 ---
 
+## Working Example
+
+To validate the engine’s architectural integrity, I performed a "Fault Injection" stress test on the `FrameworkUI.jsx` component. This process demonstrated the engine's ability to act as an automated, context-aware architectural guardrail.
+
+#### 1. Fault Injection (The Bugs)
+I intentionally introduced three high-severity architectural violations to test the engine's diagnostic capabilities:
+
+*   **Missing Authorization:** Stripped the mandatory JWT `Authorization` header required for secure API resource access.
+*   **Inconsistent Versioning:** Limited `X-Client-Version` header enforcement to the initial mount, failing to apply it to subsequent GET requests.
+*   **Debounce Failure:** Removed input debouncing, creating a race condition where rapid framework switching triggered multiple redundant API calls.
+
+#### 2. The Remediation Workflow
+I utilized the RAG engine to perform a live compliance audit and automated code correction:
+
+| Phase | Action |
+| :--- | :--- |
+| **Audit Phase** | Queried the engine: *"Read the file content inside FrameworkUI.jsx. Look at the exact fetch call and tell me which headers and debounce logic are missing compared to the rules in the PDF and PPT."* |
+| **Intelligence Phase** | The engine cross-referenced the corrupted source code against the enterprise policy documents, successfully pinpointing each specific violation. |
+| **Correction Phase** | The engine generated a fully remediated `useSWR` implementation that enforced the required security headers and debounce logic, providing a production-ready fix. |
+
+#### 3. Evidence of Success
+The following audit output confirms the engine correctly identified the missing headers and logic gaps:
+
+<img width="969" height="291" alt="image" src="https://github.com/user-attachments/assets/e2694e19-bcb9-4b0a-a2e2-4e6cbc551335" />
+
+---
+
+
+
 ## Project Structure
 
 ```text
